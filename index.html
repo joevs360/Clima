@@ -61,14 +61,15 @@
 	 }
 	 function consultarClima(){
 		urlConsulta = "https://api.hgbrasil.com/weather?key=ebb41db8&city_name="+cidade+","+estado;
+		//urlConsulta = "https://api.hgbrasil.com/weather";
 		var request = new XMLHttpRequest();
-		request.open('GET', urlConsulta);
-		
-		request.responseType = 'json-cors';
+		request.open('GET', urlConsulta,true);
+		request.withCredentials = true;
 		request.onload = function(){
 		    pegarDados(request.response);
 		}
-		request.send();  
+		request.setRequestHeader('Access-Control-Allow-Origin',window.location.href)
+		request.send();
 	 }
 	 
 	 consulta="";
