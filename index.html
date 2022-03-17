@@ -1,0 +1,218 @@
+<html>
+ <head>
+ <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+
+ </head>
+ <body style="background-color: #F9FAFD">
+    <script>
+	  cidade ="";
+	  estado ="";
+	  isCelsius = true;
+	  
+	  function converterTemp(t){
+	     if(isCelsius){
+		    return t;
+		 }
+		 else{
+		   return (t*9/5)+32;
+		 }
+	  }
+	  
+	  function GetParametro(){
+	     link = window.location.href;
+	     i = link.indexOf('?');
+		 if(i>=0){
+		    link = link.substring(i,link.length)
+	        //Pegar parametro na url
+			params = (new URL(document.location)).searchParams;
+			
+			if(params.get("cidade") != null){
+			  cidade = params.get("cidade").toUpperCase();
+			  document.getElementById("txtCidade").value = cidade;
+			  if(params.get("uf") != null){
+			    estado = params.get("uf");
+			    document.getElementById("uf").value = estado;
+			    consultarClima();
+			  }
+			}
+		 }
+	  }
+	 function buscarCidade(){
+	     cidade = document.getElementById("txtCidade").value;
+		 uf = document.getElementById("uf").value;
+		 if(uf!=""){
+		   if(cidade!=""){
+		    link = window.location.href;
+	        i = link.indexOf('?');
+		    link = link.substring(0,i);
+			//Remover acentos
+		    cidade = cidade.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+			cidade = cidade.toLowerCase();
+	        window.location.replace(link +"?cidade="+cidade+"&uf="+uf);
+		   }
+		   else{
+		    alert("Digite o nome da cidade!");
+		   }
+		 }
+		 else{
+		    alert("Selecione o estado!");
+		 }
+	 }
+	 function consultarClima(){
+		urlConsulta = "https://api.hgbrasil.com/weather?key=d6b81858&city_name="+cidade+","+estado;
+		var request = new XMLHttpRequest();
+		request.open('GET', urlConsulta);
+		
+		request.responseType = 'json-cors';
+		request.onload = function(){
+		    pegarDados(request.response);
+		}
+		request.send();  
+	 }
+	 
+	 consulta="";
+	 function pegarDados(objJson){
+	     consulta = objJson["results"];
+		 AtualizarTela();
+	 }
+	 function selectImage(condicao){
+	    img="";
+	    switch(condicao){
+		  case "storm": 
+		    img="tempestade.svg";
+			break;
+		  case "snow":
+		    img="neve.svg";
+			break;
+		  case "hail":
+		    img="granizo.svg";
+			break;
+		  case "rain":
+		    img="chuva.svg";
+			break;
+		  case "fog":
+		    img="neblina.svg";
+			break;
+		  case "clear_night":
+		  case "none_night":
+		    img="noite.svg";
+			break;
+		  case "cloud":
+		  case "cloudly_day":
+		    img="nublado.svg";
+			break;
+		  case "cloudly_night":
+		    img="nubladoN.svg";
+			break;
+		  default: 
+		    img="sol.svg";
+			break;
+		}
+		return img;
+	 }
+	 
+	 function AtualizarTela(){
+	    document.getElementById("imgAtual").src = selectImage(consulta.condition_slug);
+		document.getElementById("tempAtual").innerHTML = converterTemp(consulta.temp);
+		document.getElementById("txtDados").innerHTML = "Umidade: "+consulta.humidity +"%<br>Vento: "+consulta.wind_speedy;
+		document.getElementById("cidade").innerHTML = consulta.city;
+		document.getElementById("descricao").innerHTML = consulta.description+"<br>"+consulta.currently;
+		
+	 }
+	 function trocarCelsius(){
+	     if(!isCelsius){
+		  isCelsius = true;
+		  document.getElementById("celsius").style.color = "black";
+		  document.getElementById("fahrenheit").style.color = "gray";
+		  AtualizarTela();
+		}
+	 }
+	 function trocarFahrenheit(){
+	    if(isCelsius){
+		  isCelsius = false;
+		  document.getElementById("fahrenheit").style.color = "black";
+		  document.getElementById("celsius").style.color = "gray";
+		  AtualizarTela();
+		}
+	  }
+		
+	</script>
+	<div class="container"> 
+	  <form class="form-inline" action="javascript:buscarCidade()" style="margin: 15px">
+	    <div class="form-group mb-2">
+			<input  class="form-control-plaintext" type="text" id="txtCidade" placeholder="Digite o nome da cidade..." />
+        </div>
+		
+		<div class="form-group mx-sm-3 mb-2"">
+		<select id="uf" name="uf" class="form-control" >
+		  <option value="">Selecione um estado</option>
+          <option value="AC">Acre</option>
+          <option value="AL">Alagoas</option>
+          <option value="AP">Amapá</option>
+          <option value="AM">Amazonas</option>
+          <option value="BA">Bahia</option>
+          <option value="CE">Ceará</option>
+          <option value="DF">Distrito Federal</option>
+          <option value="ES">Espírito Santo</option>
+          <option value="GO">Goiás</option>
+          <option value="MA">Maranhão</option>
+          <option value="MT">Mato Grosso</option>
+          <option value="MS">Mato Grosso do Sul</option>
+          <option value="MG">Minas Gerais</option>
+          <option value="PA">Pará</option>
+          <option value="PB">Paraíba</option>
+          <option value="PR">Paraná</option>
+          <option value="PE">Pernambuco</option>
+          <option value="PI">Piauí</option>
+          <option value="RJ">Rio de Janeiro</option>
+          <option value="RN">Rio Grande do Norte</option>
+          <option value="RS">Rio Grande do Sul</option>
+          <option value="RO">Rondônia</option>
+          <option value="RR">Roraima</option>
+          <option value="SC">Santa Catarina</option>
+          <option value="SP">São Paulo</option>
+          <option value="SE">Sergipe</option>
+          <option value="TO">Tocantins</option>
+          <option value="EX">Estrangeiro</option>
+        </select>
+	    </div>
+		<button class="btn btn-primary mb-2" type="button" onclick="buscarCidade()"  id="btnBuscar" >Pesquisar</button>
+	   </form>
+	   <center>
+	   <div style="background-color: white">
+	      <table >
+		      <tr >
+			    <th>
+				  <center>
+				  <img id="imgAtual" src="imagens/sol.svg" width="100"/>
+				 </center>
+				</th>
+				<th>
+				  <h1 id="tempAtual" style="font-size:100px">0</h1>
+				</th>
+				<th><a href="javascript:trocarCelsius()"><h6  style="color:black" id="celsius">°C</h6></a></th>
+				<th><h6 style="color:gray" >|</h6></th>
+				<th><a href="javascript:trocarFahrenheit()"><h6 style="color:gray" id="fahrenheit">°F</h6></a></th>
+				
+				<th><p id="txtDados" style="color:gray"></th>
+				<th>
+				  <h3 id="cidade" style="margin-left: 40%" >Cidade,UF</h3>
+				  <p id="descricao"  style="margin-left: 40%">Descrição</p>
+				</th>
+			  </tr>
+		  </table>
+		  
+		   <p id="MinMax" style="background-color: #F5F6F9">
+				<img  src="imagens/min.svg" />0º
+			    <img  src="imagens/max.svg" />0º
+		   </p>
+		   <div></div>
+	   </div>
+	   </center>
+	   
+	</div>
+	
+	<script>GetParametro();</script>
+ </body>
+</html>
