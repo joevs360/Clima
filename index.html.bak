@@ -68,11 +68,11 @@
 		request.onload = function(){
 		    pegarDados(request.response);
 		}
-		request.setRequestHeader('Access-Control-Allow-Origin','*')
+		
 		request.send();
 	 }
 	 
-	 consulta="";
+	 consulta=null;
 	 function pegarDados(objJson){
 	     consulta = objJson["results"];
 		 AtualizarTela();
@@ -114,11 +114,15 @@
 	 }
 	 
 	 function AtualizarTela(){
+	   if(consulta!=null){
 	    document.getElementById("imgAtual").src = selectImage(consulta.condition_slug);
 		document.getElementById("tempAtual").innerHTML = converterTemp(consulta.temp);
 		document.getElementById("txtDados").innerHTML = "Umidade: "+consulta.humidity +"%<br>Vento: "+consulta.wind_speedy;
 		document.getElementById("cidade").innerHTML = consulta.city;
 		document.getElementById("descricao").innerHTML = consulta.description+"<br>"+consulta.currently;
+	   }
+	   
+	   
 		
 	 }
 	 function trocarCelsius(){
@@ -181,7 +185,7 @@
 		<button class="btn btn-primary mb-2" type="button" onclick="buscarCidade()"  id="btnBuscar" >Pesquisar</button>
 	   </form>
 	   <center>
-	   <div style="background-color: white">
+	   <div style="background-color: white" id="divResultado">
 	      <table >
 		      <tr >
 			    <th>
